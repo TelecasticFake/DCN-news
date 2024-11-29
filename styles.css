@@ -88,11 +88,11 @@ header {
   }
 
   .navbar.bg-body-tertiary {
-    background-color: rgba(255, 0, 0, 0.5); /* translucent red background */
+    background-color: rgba(255, 0, 0, 0.5); 
   }
 
 .pagination-btn {
-  background-color: rgb(197, 0, 0); /* matching the red theme */
+  background-color: rgb(197, 0, 0); 
   color: white;
   border: none;
   padding: 10px 20px;
@@ -103,10 +103,10 @@ header {
 }
 
 .pagination-btn:hover {
-  background-color: rgba(197, 0, 0, 0.8); /* darker on hover */
-  transform: scale(1.05); /* slight grow on hover */
+  background-color: rgba(197, 0, 0, 0.8); 
+  transform: scale(1.05); 
 }
 
 .pagination-btn:active {
-  transform: scale(0.95); /* shrink on click */
+  transform: scale(0.95); 
 }

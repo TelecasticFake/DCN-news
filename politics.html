@@ -21,28 +21,11 @@
         <li><a href="politics.html">Politics</a></li>
         <li><a href="sports.html">Sports</a></li>
         <li><a href="entertainment.html">Entertainment</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="contact">Contact</a></li>
       </ul>
     </nav>
   </header>
   <body>
-    <nav class="navbar">
-      <div class="container-fluid">
-        <a class="navbar-brand"></a>
-        <form class="d-flex" role="search">
-          <input
-            id="searchInput"
-            class="form-control me-2"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <button id="search" class="btn btn-outline-success" type="submit">
-            Search
-          </button>
-        </form>
-      </div>
-    </nav>
     <div class="container">
       <h1>Welcome to DCN News (<span id="resultCount"></span> Results)</h1>
       <div class="row content">
@@ -77,8 +60,7 @@
         console.log("Fetching news...");
         var url =
           "https://newsapi.org/v2/everything?" +
-          "q=" +
-          q +
+          "q=Politics" +
           "&pageSize=21&" +
           "page=" +
           page +
@@ -102,7 +84,7 @@
           <p class="card-text">
             ${item.description}
           </p>
-          <a href=${item.url}="btn btn-primary pagination-btn">Go somewhere</a>
+          <a href="#" class="btn btn-primary pagination-btn">Go somewhere</a>
 
         </div>
       </div>
