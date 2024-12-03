@@ -3,7 +3,7 @@ import mysql.connector as msql
 
 app = Flask(__name__)
 
-# Simple HTML template for login page
+
 login_page = """
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +95,7 @@ login_page = """
 </html>
 """
 
-# Home page after login
+
 home_page = """
 <!DOCTYPE html>
 <html>
@@ -108,7 +108,7 @@ home_page = """
 </body>
 </html>
 """
-# Success page
+
 success_page = """
 <!DOCTYPE html>
 <html>
@@ -122,7 +122,7 @@ success_page = """
 </html>
 """
 
-# Failure page
+
 failure_page = """
 <!DOCTYPE html>
 <html>
@@ -136,18 +136,18 @@ failure_page = """
 </html>
 """
 
-# Route for login page
+
 @app.route("/")
 def login():
     return render_template_string(login_page)
 
-# Route for login handling
+
 @app.route("/login", methods=["POST"])
 def handle_login():
     username = request.form["username"]
     password = request.form["password"]
 
-    # Check credentials in the database
+    
     conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM logintable WHERE loginusername = %s AND loginpassword = %s", (username, password))
