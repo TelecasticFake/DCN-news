@@ -87,7 +87,9 @@ login_page = """
         </form>
         
         <div class="viewer">
-            <p><a href="/signup">Don't have an account?</a></p>
+        <form action="/signup_page">
+            <input type="submit" value="Go to signup" />
+        </form>
         </div>
     </div>
 
@@ -177,8 +179,9 @@ signup_page = """
         </form>
         
         <div class="viewer">
-            <p><a href="/login">Already have an account?</a></p>
-        </div>
+        <form action="/login_page">
+            <input type="submit" value="Go to login" />
+        </form>
     </div>
 
 </body>
@@ -230,6 +233,9 @@ failure_page = """
 def login():
     return render_template_string(login_page)
 
+@app.route("/signup_page")
+def signup():
+    return render_template_string(signup_page)
 
 @app.route("/login", methods=["POST"])
 def handle_login():
@@ -249,14 +255,17 @@ def handle_login():
         return render_template_string(failure_page)
 
 @app.route("/signup", methods=["POST"])
-def handle_signup();
+def handle_signup():
     username = request.form["username"]
     password = request.form["password"]
 
     
     conn = msql.connect(host="localhost", user="root", password="root", database="dnc")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO logintable (loginusername, loginusername) VALUES(%s, %s);", (username, password))
+    cursor.execute("Count(*) from logintable;")
+    count=cursor.fetchone()
+    newid=count+1
+    cursor.execute("INSERT INTO logintable (loginid, loginusername, loginpassword) VALUES(%s, %s, %s);", (newid, username, password))
     cursor.commit()
     conn.close()
     return render_template_string(success_page, username=username)
