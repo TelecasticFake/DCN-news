@@ -346,6 +346,119 @@ failure_page = """
 </html>
 """
 
+styles= """""
+body {
+  background-image: url('images/logo.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: rgb(197, 0, 0);
+  padding: 1rem;
+  text-align: center;
+}
+
+h1 {
+font-family: Lobster, cursive; /* stylish font */
+font-weight: bold; /* bold text */
+color:rgb(197, 0, 0); /* red color */
+
+
+}
+
+.navbar{
+background-color: rgb(197, 0, 0);;
+}
+nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+nav ul li {
+  display: inline;
+  margin-right: 1rem;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.card {
+height: 600px;
+}
+header {
+  animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+nav ul {
+  animation: slideIn 2s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+a:hover {
+  font-weight: bold;
+  color:rgb(197, 0, 0);
+  background-color: #333;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.5s;
+}
+nav ul li a:not(:hover) {
+  color: #fff;
+  padding: 0;
+  border-radius: 0;
+  transition: all 0.3s;
+}
+
+.navbar.bg-body-tertiary {
+  background-color: rgba(255, 0, 0, 0.5); /* translucent red background */
+}
+
+.pagination-btn {
+background-color: rgb(197, 0, 0); /* matching the red theme */
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 5px;
+font-size: 16px;
+cursor: pointer;
+transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.pagination-btn:hover {
+background-color: rgba(197, 0, 0, 0.8); /* darker on hover */
+transform: scale(1.05); /* slight grow on hover */
+}
+
+.pagination-btn:active {
+transform: scale(0.95); /* shrink on click */
+}"""
 
 @app.route("/")
 def login():
