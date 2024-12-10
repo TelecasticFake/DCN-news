@@ -1,5 +1,6 @@
 from flask import Flask, render_template_string, request, redirect, url_for, render_template
 import mysql.connector as msql 
+from mysql.connector import Error, IntegrityError
 
 app = Flask(__name__)
 
@@ -317,11 +318,11 @@ failure_page = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Failed</title>
+    <title>{{process}} Failed</title>
 </head>
 <body>
-    <h2>Login Failed</h2>
-    <p>Invalid username or password. Please try again.</p>
+    <h2>{{process}} Failed</h2>
+    <p>{{error_msg}}</p>
 </body>
 </html>
 """
@@ -451,9 +452,10 @@ def signup():
 
 @app.route("/login", methods=["POST"])
 def handle_login():
+    process="Login"
     username = request.form["username"]
     password = request.form["password"]
-
+    error_msg="Invalid username or password. Please try again."
     
     conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
     cursor = conn.cursor()
@@ -464,10 +466,11 @@ def handle_login():
     if user:
         return render_template_string(success_page, username=username)
     else:
-        return render_template_string(failure_page)
+        return render_template_string(failure_page, process=process, error_msg=error_msg)
 
 @app.route("/signup", methods=["POST"])
 def handle_signup():
+    process="Sign up"
     username = request.form["username"]
     password = request.form["password"]
 
@@ -483,14 +486,18 @@ def handle_signup():
             (newid, username, password)
         )
         conn.commit()
+    except IntegrityError as e:
+        duplicate_msg="This username is already in use. Please try a new one."
+        return render_template_string(failure_page, process=process, error_msg=duplicate_msg)
     except msql.Error as e:
-        return f"An error occurred: {e}"
+        error_msg="Following error has occurred:{e} \n Please contact the developers"
+        return render_template_string(failure_page, process=process, error_msg=error_msg)
     finally:
         conn.close()
 
     return render_template_string(success_page, username=username)
 
-@app.route("/politics")
+@app.route("/politics") 
 def politics():
     print("Rendering politics template...")
     return render_template("politics.html")
