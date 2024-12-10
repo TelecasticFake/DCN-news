@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `logintable`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `logintable` (
   `LoginID` int NOT NULL,
-  `LoginUsername` varchar(45) NOT NULL,
+  `LoginUsername` varchar(45) NOT NULL UNIQUE,
   `LoginPassword` varchar(45) NOT NULL DEFAULT '12345678',
   `Role` varchar(45) NOT NULL DEFAULT 'Viewer',
   PRIMARY KEY (`LoginID`)
