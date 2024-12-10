@@ -1,5 +1,6 @@
-from flask import Flask, render_template_string, request, redirect, url_for
+from flask import Flask, render_template_string, request, redirect, url_for, render_template
 import mysql.connector as msql 
+from mysql.connector import Error, IntegrityError
 
 app = Flask(__name__)
 
@@ -58,17 +59,7 @@ login_page = """
         }
         .login-btn:hover {
             background-color: #0056b3;
-        }
-        .forgot-password {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .forgot-password a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .forgot-password a:hover {
-            text-decoration: underline;
+       
         }
     </style>
 </head>
@@ -150,18 +141,7 @@ signup_page = """
         }
         .login-btn:hover {
             background-color: #0056b3;
-        }
-        .forgot-password {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .forgot-password a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
+      
     </style>
 </head>
 <body>
@@ -179,9 +159,10 @@ signup_page = """
         </form>
         
         <div class="viewer">
-        <form action="/login_page">
+        <form action="/">
             <input type="submit" value="Go to login" />
         </form>
+        </div>
     </div>
 
 </body>
@@ -220,19 +201,19 @@ success_page = """
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <header>
     <h1>DCN NEWS</h1>
     <nav>
       <ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="world.html">World</a></li>
-        <li><a href="politics.html">Politics</a></li>
-        <li><a href="sports.html">Sports</a></li>
-        <li><a href="entertainment.html">Entertainment</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/world">World</a></li>
+    <li><a href="/politics">Politics</a></li>
+    <li><a href="/sports">Sports</a></li>
+    <li><a href="/entertainment">Entertainment</a></li>
+    <li><a href="#contact">Contact</a></li>
+</ul>
     </nav>
   </header>
   <body>
@@ -311,8 +292,7 @@ success_page = """
           <p class="card-text">
             ${item.description}
           </p>
-          <a href=${item.url}="btn btn-primary pagination-btn">Go somewhere</a>
-
+          <a href=${item.url}" btn-primary pagination-btn">Go somewhere</a>
         </div>
       </div>
     </div>`;
@@ -333,15 +313,16 @@ success_page = """
 """
 
 
+
 failure_page = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Failed</title>
+    <title>{{process}} Failed</title>
 </head>
 <body>
-    <h2>Login Failed</h2>
-    <p>Invalid username or password. Please try again.</p>
+    <h2>{{process}} Failed</h2>
+    <p>{{error_msg}}</p>
 </body>
 </html>
 """
@@ -460,6 +441,7 @@ transform: scale(1.05); /* slight grow on hover */
 transform: scale(0.95); /* shrink on click */
 }"""
 
+
 @app.route("/")
 def login():
     return render_template_string(login_page)
@@ -470,11 +452,12 @@ def signup():
 
 @app.route("/login", methods=["POST"])
 def handle_login():
+    process="Login"
     username = request.form["username"]
     password = request.form["password"]
-
+    error_msg="Invalid username or password. Please try again."
     
-    conn = msql.connect(host="localhost", user="root", password="root", database="dnc")
+    conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM logintable WHERE loginusername = %s AND loginpassword = %s", (username, password))
     user = cursor.fetchone()
@@ -483,23 +466,56 @@ def handle_login():
     if user:
         return render_template_string(success_page, username=username)
     else:
-        return render_template_string(failure_page)
+        return render_template_string(failure_page, process=process, error_msg=error_msg)
 
 @app.route("/signup", methods=["POST"])
 def handle_signup():
+    process="Sign up"
     username = request.form["username"]
     password = request.form["password"]
 
-    
-    conn = msql.connect(host="localhost", user="root", password="root", database="dnc")
-    cursor = conn.cursor()
-    cursor.execute("Count(*) from logintable;")
-    count=cursor.fetchone()
-    newid=count+1
-    cursor.execute("INSERT INTO logintable (loginid, loginusername, loginpassword) VALUES(%s, %s, %s);", (newid, username, password))
-    cursor.commit()
-    conn.close()
+    try:
+        conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM logintable;")
+        count = cursor.fetchone()[0]
+        newid = count + 1
+
+        cursor.execute(
+            "INSERT INTO logintable (loginid, loginusername, loginpassword) VALUES (%s, %s, %s);",
+            (newid, username, password)
+        )
+        conn.commit()
+    except IntegrityError as e:
+        duplicate_msg="This username is already in use. Please try a new one."
+        return render_template_string(failure_page, process=process, error_msg=duplicate_msg)
+    except msql.Error as e:
+        error_msg="Following error has occurred:{e} \n Please contact the developers"
+        return render_template_string(failure_page, process=process, error_msg=error_msg)
+    finally:
+        conn.close()
+
     return render_template_string(success_page, username=username)
+
+@app.route("/politics") 
+def politics():
+    print("Rendering politics template...")
+    return render_template("politics.html")
+
+@app.route("/world")
+def world():
+    print("Rendering world template...")
+    return render_template("world.html")
+
+@app.route("/sports")
+def sports():
+    print("Rendering sports template...")
+    return render_template("sports.html")
+
+@app.route("/entertainment")
+def entertainment():
+    print("Rendering entertainment template...")
+    return render_template("entertainment.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
