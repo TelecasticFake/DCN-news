@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, request, redirect, url_for, render_template
 import mysql.connector as msql 
 from mysql.connector import Error, IntegrityError
+import requests
 
 app = Flask(__name__)
 
@@ -464,7 +465,9 @@ def handle_login():
     conn.close()
 
     if user:
-        return render_template_string(success_page, username=username)
+        fetch_news()
+        get_news() 
+        return render_template_string(success_page, username=username, title=articles[0][1])
     else:
         return render_template_string(failure_page, process=process, error_msg=error_msg)
 
@@ -494,7 +497,7 @@ def handle_signup():
         return render_template_string(failure_page, process=process, error_msg=error_msg)
     finally:
         conn.close()
-
+    fetch_news()
     return render_template_string(success_page, username=username)
 
 @app.route("/politics") 
@@ -516,6 +519,77 @@ def sports():
 def entertainment():
     print("Rendering entertainment template...")
     return render_template("entertainment.html")
+
+@app.route("/fetch_news")
+def fetch_news():
+    api_key = "934719473fce4176804d2174d4c529dc"
+    url = f"https://newsapi.org/v2/everything?q=Breaking News&apiKey={api_key}"
+    
+    response = requests.get(url)
+    articles = response.json().get("articles", [])
+
+    conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
+    cursor = conn.cursor()
+    cursor.execute(
+        "DROP TABLE IF EXISTS news_articles;"
+    )
+    cursor.execute("CREATE TABLE news_articles (DataNo int primary key, title varchar(200), description long varchar, url long varchar, urlToImage long varchar, category varchar(20));")
+    count=0
+    for article in articles:
+        title = article.get("title")
+        description = article.get("description")
+        url = article.get("url")
+        urlToImage = article.get("urlToImage")
+        category = "General"  # You can modify this based on your needs
+        count = count + 1
+        cursor.execute(
+            "INSERT INTO news_articles (DataNo, title, description, url, urlToImage, category) VALUES (%s, %s, %s, %s, %s, %s)",
+            (count, title, description, url, urlToImage, category)
+        )
+
+    conn.commit()
+    conn.close()
+
+    return "News articles fetched and stored successfully!"
+
+
+def get_news():
+    try:
+        # Connect to the database
+        conn = msql.connect(host="localhost", user="root", password="root", database="dnc_news")
+        cursor = conn.cursor()
+
+        # Execute a query to select all articles from the news_articles table
+        cursor.execute("SELECT * FROM news_articles;")
+        
+        # Fetch all rows from the executed query
+        rows = cursor.fetchall()
+
+        # Create a list to hold the articles
+        articles = []
+        
+        # Iterate through the rows and create a dictionary for each article
+        for row in rows:
+            article = {
+                "title": row[1],
+                "description": row[2],
+                "url": row[3],
+                "urlToImage": row[4],
+                "category": row[5]
+            }
+            articles.append(article)
+
+        return articles  # Return the list of articles
+
+    except msql.Error as e:
+        print(f"Error: {e}")
+        return []  # Return an empty list in case of an error
+
+    finally:
+        # Close the database connection
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
 
 if __name__ == "__main__":
     app.run(debug=True)
