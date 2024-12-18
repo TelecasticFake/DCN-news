@@ -5,7 +5,6 @@ import requests
 
 app = Flask(__name__)
 
-
 login_page = """
 <!DOCTYPE html>
 <html lang="en">
@@ -313,8 +312,6 @@ success_page = """
 </html>
 """
 
-
-
 failure_page = """
 <!DOCTYPE html>
 <html>
@@ -466,8 +463,8 @@ def handle_login():
 
     if user:
         fetch_news()
-        get_news() 
-        return render_template_string(success_page, username=username, title=articles[0][1])
+        articles = get_news()  # Fetch news articles
+        return render_template_string(success_page, username=username, articles=articles)
     else:
         return render_template_string(failure_page, process=process, error_msg=error_msg)
 
@@ -497,8 +494,8 @@ def handle_signup():
         return render_template_string(failure_page, process=process, error_msg=error_msg)
     finally:
         conn.close()
-    fetch_news()
-    return render_template_string(success_page, username=username)
+    articles = get_news()  # Fetch news articles
+    return render_template_string(success_page, username=username, articles=articles)
 
 @app.route("/politics") 
 def politics():
