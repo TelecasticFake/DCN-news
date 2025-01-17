@@ -186,15 +186,7 @@ success_page = """
 <!DOCTYPE html>
 <html>
 <head>
-<body>
-    <h2>Welcome, {{ username }}!</h2>
-    <p>You are successfully logged in.</p>
-    <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DCN News</title>
+    <title>Home</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -202,112 +194,45 @@ success_page = """
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  </head>
-  <header>
-    <h1>DCN NEWS</h1>
-    <nav>
-      <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/world">World</a></li>
-    <li><a href="/politics">Politics</a></li>
-    <li><a href="/sports">Sports</a></li>
-    <li><a href="/entertainment">Entertainment</a></li>
-    <li><a href="#contact">Contact</a></li>
-</ul>
-    </nav>
-  </header>
-  <body>
-    <nav class="navbar">
-      <div class="container-fluid">
-        <a class="navbar-brand"></a>
-        <form class="d-flex" role="search">
-          <input
-            id="searchInput"
-            class="form-control me-2"
-            type="search"
-            placeholder="Sea"
-            aria-label="Search"
-          />
-          <button id="search" class="btn btn-outline-success" type="submit">
-            Search
-          </button>
-        </form>
-      </div>
-    </nav>
+</head>
+<body>
+    <header>
+        <h2>Welcome, {{ username }}!</h2>
+        <p>You are successfully logged in.</p>
+        <h1>DCN NEWS</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/world">World</a></li>
+                <li><a href="/politics">Politics</a></li>
+                <li><a href="/sports">Sports</a></li>
+                <li><a href="/entertainment">Entertainment</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
     <div class="container">
-      <h1>Welcome to DCN News (<span id="resultCount"></span> Results)</h1>
-      <div class="row content">
-        <div class="card my-4 mx-2" style="width: 18rem">
-          <img src="..." class="card-img-top" alt="..." />
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
+        <h1>Welcome to DCN News</h1>
+        <div class="row content">
+            {% for article in articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="{{ article.urlToImage }}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ article.title }}</h5>
+                            <p class="card-text">{{ article.description }}</p>
+                            <a href="{{ article.url }}" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-      </div>
-      <div class="d-flex justify-content-around">
-        <button class="btn pagination-btn">< Previous Page</button>
-        <button class="btn pagination-btn">Next Page ></button>
-      </div>
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script>
-      const search = document.getElementById("search");
-      const searchInput = document.getElementById("searchInput");
-      const resultCount = document.getElementById("resultCount");
-
-      const fetchNews = async (page, q) => {
-        console.log("Fetching news...");
-        var url =
-          "https://newsapi.org/v2/everything?" +
-          "q=" +
-          q +
-          "&pageSize=21&" +
-          "page=" +
-          page +
-          "&sortBy=popularity&" +
-          "apiKey=934719473fce4176804d2174d4c529dc";
-
-        var req = new Request(url);
-
-        let a = await fetch(req);
-        let response = await a.json();
-        console.log(response);
-        let str = "";
-        resultCount.innerHTML = response.totalResults;
-        for (let item of response.articles) {
-          str += `<div class="col-md-4 mb-4">
-      <div class="card" style="width: 18rem;">
-        <img src="${item.urlToImage}" class="card-img-top" alt="..." />
-        <div class="card-body">
-          <h5 class="card-title">${item.title}</h5>
-          <p class="card-text">
-            ${item.description}
-          </p>
-          <a href=${item.url}" btn-primary pagination-btn">Go somewhere</a>
-        </div>
-      </div>
-    </div>`;
-        }
-        document.querySelector(".content").innerHTML = str;
-      };
-      fetchNews(1, "Breaking News");
-      search.addEventListener("click", (e) => {
-        e.preventDefault();
-        let query = searchInput.value;
-        fetchNews(1, query);
-      });
-    </script>
-  </body>
-</html>
 </body>
 </html>
 """
